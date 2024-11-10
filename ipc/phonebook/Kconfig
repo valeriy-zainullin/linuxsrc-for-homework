@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Phonebook syscalls configuration
+#
+
+config PHONEBOOK
+	bool "Phonebook syscalls"
+	default y
+	help
+	  Support for phonebook syscalls.
