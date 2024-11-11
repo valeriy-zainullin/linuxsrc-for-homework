@@ -13,6 +13,8 @@
 
 #include "phonebook.h"
 
+#ifdef CONFIG_MODULES
+
 // From module subsystem internals. $(linux_src)/kernel/module/internal.h
 extern struct mutex module_mutex;
 
@@ -163,7 +165,7 @@ SYSCALL_DEFINE3(get_user, const char* __user, last_name, unsigned int, len, stru
 		kfree(copied_last_name);
 		kfree(ud_to_copy);
 		module_put(pb_mod);
-		return -EFAULT;		
+		return -EFAULT;
 	}
 
 	kfree(copied_last_name);
@@ -224,3 +226,25 @@ SYSCALL_DEFINE2(del_user, const char* __user, last_name, unsigned int, len) {
 	module_put(pb_mod);
 	return result;
 }
+
+#else
+
+SYSCALL_DEFINE1(add_user, struct pb_user_data* __user, ud) {
+	(void) ud;
+	return -ENODEV;
+}
+
+SYSCALL_DEFINE3(get_user, const char* __user, last_name, unsigned int, len, struct pb_user_data* __user, ud) {
+	(void) last_name;
+	(void) len;
+	(void) ud;
+	return -ENODEV;
+}
+
+SYSCALL_DEFINE2(del_user, const char* __user, last_name, unsigned int, len) {
+	(void) last_name;
+	(void) len;
+	return -ENODEV;
+}
+
+#endif
