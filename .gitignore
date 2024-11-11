@@ -177,3 +177,7 @@ sphinx_*/
 
 # Rust analyzer configuration
 /rust-project.json
+
+# Store config for homework.
+#   So that the directory is ready to be built.
+!.config
