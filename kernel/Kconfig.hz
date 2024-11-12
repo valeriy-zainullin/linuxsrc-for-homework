@@ -57,3 +57,13 @@ config HZ
 
 config SCHED_HRTICK
 	def_bool HIGH_RES_TIMERS
+
+config NR_TIMES_SCHEDULED
+	bool "Count times the task was scheduled"
+	default y
+	help
+	  Count times task was scheduled for execution and export it
+	  through "/proc/<pid>/nr_times_scheduled" file.
+	  Current implementation supports 6 years of counting without an
+	  overflow at the reschedule rate of 100ms (if the same task is
+	  rescheduled), meaning the counter is 32bit.

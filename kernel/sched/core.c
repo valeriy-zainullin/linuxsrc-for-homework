@@ -4557,6 +4557,10 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
 	 */
 	p->prio = current->normal_prio;
 
+#ifdef CONFIG_NR_TIMES_SCHEDULED
+	atomic_set(&p->nr_times_scheduled, 0);
+#endif /* CONFIG_NR_TIMES_SCHEDULED */
+
 	uclamp_fork(p);
 
 	/*
@@ -6482,6 +6486,9 @@ static void __sched notrace __schedule(unsigned int sched_mode)
 	}
 
 	next = pick_next_task(rq, prev, &rf);
+#ifdef CONFIG_NR_TIMES_SCHEDULED
+	atomic_inc(&next->nr_times_scheduled);
+#endif
 	clear_tsk_need_resched(prev);
 	clear_preempt_need_resched();
 #ifdef CONFIG_SCHED_DEBUG

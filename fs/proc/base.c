@@ -3239,6 +3239,15 @@ static int proc_stack_depth(struct seq_file *m, struct pid_namespace *ns,
 }
 #endif /* CONFIG_STACKLEAK_METRICS */
 
+#ifdef CONFIG_NR_TIMES_SCHEDULED
+static int proc_pid_nr_times_scheduled(struct seq_file *m, struct pid_namespace *ns,
+				struct pid *pid, struct task_struct *task)
+{
+	seq_printf(m, "%d\n", atomic_read(&task->nr_times_scheduled));
+	return 0;
+}
+#endif /* CONFIG_NR_TIMES_SCHEDULED */
+
 /*
  * Thread groups
  */
@@ -3358,6 +3367,13 @@ static const struct pid_entry tgid_base_stuff[] = {
 #ifdef CONFIG_KSM
 	ONE("ksm_merging_pages",  S_IRUSR, proc_pid_ksm_merging_pages),
 	ONE("ksm_stat",  S_IRUSR, proc_pid_ksm_stat),
+#endif
+#ifdef CONFIG_NR_TIMES_SCHEDULED
+	// S_IRUSR, видимо, даст читать только владельцу (в определении 400,
+	//   r--------, это должно быть как в chmod, по идее).
+	// У файлов в /proc действительно есть владельцы. Владеют те, под чьим
+	//   именем работают процессы, как видим. `ls -l /proc`.
+	ONE("nr_times_scheduled", S_IRUSR, proc_pid_nr_times_scheduled)
 #endif
 };
 
@@ -3698,6 +3714,7 @@ static const struct pid_entry tid_base_stuff[] = {
 	ONE("ksm_merging_pages",  S_IRUSR, proc_pid_ksm_merging_pages),
 	ONE("ksm_stat",  S_IRUSR, proc_pid_ksm_stat),
 #endif
+
 };
 
 static int proc_tid_base_readdir(struct file *file, struct dir_context *ctx)

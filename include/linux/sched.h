@@ -1568,6 +1568,27 @@ struct task_struct {
 	struct user_event_mm		*user_event_mm;
 #endif
 
+#ifdef CONFIG_NR_TIMES_SCHEDULED
+	// We have an int inside of this. Well, it's mostly 32bit. There
+	//   are values up to 2^31 - 1. Imagine task switch happens each
+	//   100ms, then we get 10 switches per second. If we can
+	//   represent 2^31 - 1 switches, then it's enough for
+	//   (2^31 - 1) / 10 seconds =
+	//   214748364.7  seconds    ~=
+	//   3579139.4116 minutes    ~=
+	//   59652.3235   hours      ~=
+	//   2485.5134    days       ~=
+	//   6.8096       years.
+	// Which is not bad, 6 years of uptime. And not only that, but
+	//   task may be not scheduled as often. We're considering the
+	//   case, when one it's scheduled each iteration. Then it lasts
+	//   6 years, but that's our worst-case scenario. So should work
+	//   for 6 years of uptime without an overflow.
+	// We should think about such ideas, our code may work for a huge
+	//   amount of time.
+	atomic_t                     nr_times_scheduled;
+#endif
+
 	/*
 	 * New fields for task_struct should be added above here, so that
 	 * they are included in the randomized portion of task_struct.
